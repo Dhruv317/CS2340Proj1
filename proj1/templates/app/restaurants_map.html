@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Restaurant Map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap" async defer></script>
+    <script>
+        var map;
+        var restaurants = {{ restaurants| safe }};  // Django passes the list of restaurants as JSON
+
+        // Initialize and add the map
+        function initMap() {
+            // Center the map on the given location
+            var mapCenter = { lat: {{ lat }
+        }, lng: { { lng } }};
+
+        // Create the map centered around the given location
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 14,
+            center: mapCenter
+        });
+
+        // Loop through the restaurants and add markers for each
+        for (var i = 0; i < restaurants.length; i++) {
+            var restaurant = restaurants[i];
+
+            // Create a marker for each restaurant
+            var marker = new google.maps.Marker({
+                position: { lat: restaurant.lat, lng: restaurant.lng },
+                map: map,
+                title: restaurant.name
+            });
+
+            // Add click listener to each marker
+            attachInfoWindow(marker, restaurant);
+        }
+        }
+
+        // Attach an info window to each marker with restaurant details
+        function attachInfoWindow(marker, restaurant) {
+            var infowindow = new google.maps.InfoWindow({
+                content: `<div><strong>${restaurant.name}</strong><br>
+                          Rating: ${restaurant.rating}<br>
+                          Address: ${restaurant.address}</div>`
+            });
+
+            // Show info window on marker click
+            marker.addListener('click', function () {
+                infowindow.open(map, marker);
+            });
+        }
+    </script>
+    <style>
+        /* Style for the map container */
+        #map {
+            height: 100%;
+            width: 100%;
+            min-height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Restaurants Near Location</h1>
+    <!-- The map container -->
+    <div id="map"></div>
+</body>
+
+</html>
